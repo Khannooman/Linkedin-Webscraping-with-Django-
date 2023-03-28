@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Linkedin Jobs</title>
+	<style>
+		body {
+			background-color: #F2F2F2;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.job-container {
+			background-color: #FFFFFF;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px #BFBFBF;
+			margin: 20px auto;
+			padding: 20px;
+			width: 80%;
+		}
+		h2, p {
+			margin: 0;
+		}
+		h2 {
+			color: #004A75;
+			font-size: 24px;
+			margin-bottom: 10px;
+		}
+		p {
+			color: #4A4A4A;
+			font-size: 16px;
+			margin-bottom: 5px;
+		}
+        .apply-job {
+        background-color: #0077B5;
+        border: none;
+        border-radius: 3px;
+        color: #FFFFFF;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 8px 12px;
+        transition: background-color 0.3s;
+        }
+
+        .apply-job:hover {
+            background-color: #005F8B;
+        }
+        .save-job {
+			background-color: #004A75;
+			border: none;
+			border-radius: 3px;
+			color: #FFFFFF;
+			cursor: pointer;
+			font-size: 14px;
+			padding: 8px 12px;
+			transition: background-color 0.3s;
+		}
+		.save-job:hover {
+			background-color: #1C7293;
+        }
+
+        .job-desc {
+			display: none;
+			margin-top: 10px;
+		}
+		.show-desc {
+			background-color: #004A75;
+			border: none;
+			border-radius: 3px;
+			color: #FFFFFF;
+			cursor: pointer;
+			font-size: 14px;
+			padding: 8px 12px;
+			transition: background-color 0.3s;
+		}
+		.show-desc:hover {
+			background-color: #1C7293;
+		}
+
+    </style>
+</head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <body>
+        {% for item in details %}
+          <h2>{{ item.1 }}</h2>
+          <p><strong>Job Role:</strong> <strong>{{ item.0 }}</strong></p>
+          <p><strong>Location:</strong> <strong>{{ item.2 }}</strong></p>
+          <p><strong>Posted:</strong> <strong>{{ item.3 }}</strong></p>
+          <p><strong>Job Description:</strong></p>
+          <p>
+            <button class="show-desc">Show Description</button>
+          </p>
+          <div class="job-desc" style="display: none;">
+            <p>{{ item.4 }}</p>
+          </div>
+          <p>
+            <button class="save-job" data-company="{{ item.1 }}" data-job-role="{{ item.0 }}" data-location="{{ item.2 }}" data-posted="{{ item.3 }}" data-job-description="{{ item.4 }}" data-apply="{{ item.5 }}">Save This Job</button>
+            <a href="{{ item.5 }}" class="apply-job">Apply</a>
+          </p>
+          <hr>
+      {% endfor %}
+      <script>
+        $(document).ready(function() {
+          $('.show-desc').click(function() {
+            var desc = $(this).parent().next('.job-desc');
+            desc.toggle();
+            var buttonText = desc.is(':visible') ? 'Hide Description' : 'Show Description';
+            $(this).text(buttonText);
+          });
+        });
+    
+        $(document).ready(function() {
+          $('.save-job').click(function() {
+            var company = $(this).data('company');
+            var jobRole = $(this).data('job-role');
+            var location = $(this).data('location');
+            var posted = $(this).data('posted');
+            var jd = $(this).data('job-description');
+            var link = $(this).data('apply');
+            $(this).text('Job Saved');
+            $.ajax({
+              type: 'POST',
+              url: '{% url "save_job" %}',
+              data: JSON.stringify({
+                'company': company,
+                'job_role': jobRole,
+                'location': location,
+                'posted': posted,
+                'JD': jd,
+                'link': link
+              }),
+              dataType: 'json',
+              success: function(response) {
+                console.log(response.status);
+              },
+              error: function(xhr, status, error) {
+                console.log(error);
+              }
+            });
+          });
+        });
+      </script>
+    </body>
+    </html>
